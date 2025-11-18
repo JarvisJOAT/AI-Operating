@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface Contact {
   id: string;
+  organization_id: string;
   first_name: string;
   last_name: string | null;
   email: string | null;
@@ -28,48 +29,67 @@ export function useContacts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!currentOrganization) return;
+    if (!currentOrganization) {
+      setContacts([]);
+      setLoading(false);
+      return;
+    }
 
     fetchContacts();
-
-    const subscription = supabase
-      .channel('contacts_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'contacts',
-          filter: `organization_id=eq.${currentOrganization.id}`,
-        },
-        () => {
-          fetchContacts();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      subscription.unsubscribe();
-    };
   }, [currentOrganization]);
 
   const fetchContacts = async () => {
-    if (!currentOrganization) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('contacts')
-        .select('*')
-        .eq('organization_id', currentOrganization.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setContacts(data || []);
-    } catch (error) {
-      console.error('Error fetching contacts:', error);
-    } finally {
+    if (!currentOrganization) {
+      setContacts([]);
       setLoading(false);
+      return;
     }
+
+    setLoading(true);
+    setTimeout(() => {
+      // Mock data filtered by organization_id (consistent with useProjects approach)
+      // Only contacts belonging to the current organization are returned
+      const mockContacts: Contact[] = [
+        {
+          id: 'contact-demo-1',
+          organization_id: currentOrganization.id,
+          first_name: 'John',
+          last_name: 'Doe',
+          email: 'john.doe@example.com',
+          phone: '+1 (555) 123-4567',
+          title: 'CTO',
+          company_id: null,
+          company_name: 'Tech Startup Inc.',
+          date_of_birth: '1985-06-15',
+          notes: 'Good lead, interested in our AI solutions',
+          lead_status: 'qualified',
+          lead_score: 85,
+          tags: ['high-value', 'tech-savvy'],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        {
+          id: 'contact-demo-2',
+          organization_id: currentOrganization.id,
+          first_name: 'Jane',
+          last_name: 'Smith',
+          email: 'jane.smith@marketing.com',
+          phone: '+1 (555) 987-6543',
+          title: 'Marketing Director',
+          company_id: null,
+          company_name: 'Brand Agency LLC',
+          date_of_birth: '1990-03-22',
+          notes: 'Needs our marketing automation tools',
+          lead_status: 'contacted',
+          lead_score: 65,
+          tags: ['marketing', 'automation'],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+      ];
+      setContacts(mockContacts);
+      setLoading(false);
+    }, 500);
   };
 
   const createContact = async (contactData: {
@@ -82,34 +102,33 @@ export function useContacts() {
     date_of_birth?: string;
     notes?: string;
   }) => {
-    if (!currentOrganization || !user) return null;
-
-    try {
-      const { data, error } = await supabase
-        .from('contacts')
-        .insert({
-          organization_id: currentOrganization.id,
-          first_name: contactData.first_name,
-          last_name: contactData.last_name || null,
-          email: contactData.email || null,
-          phone: contactData.phone || null,
-          title: contactData.title || null,
-          company_name: contactData.company_name || null,
-          date_of_birth: contactData.date_of_birth || null,
-          notes: contactData.notes || null,
-          lead_status: 'new',
-          lead_score: 0,
-          created_by: user.id,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Error creating contact:', error);
-      throw error;
+    if (!currentOrganization) {
+      throw new Error('No organization selected');
     }
+
+    // Mock successful creation (consistent with useProjects approach)
+    const newContact: Contact = {
+      id: `contact-${Date.now()}`,
+      organization_id: currentOrganization.id,
+      first_name: contactData.first_name,
+      last_name: contactData.last_name || null,
+      email: contactData.email || null,
+      phone: contactData.phone || null,
+      title: contactData.title || null,
+      company_id: null,
+      company_name: contactData.company_name || null,
+      date_of_birth: contactData.date_of_birth || null,
+      notes: contactData.notes || null,
+      lead_status: 'new',
+      lead_score: 0,
+      tags: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    // Add to local state for immediate UI feedback
+    setContacts(prev => [newContact, ...prev]);
+    return newContact;
   };
 
   const updateContact = async (

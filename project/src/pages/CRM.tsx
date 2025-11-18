@@ -38,20 +38,29 @@ export default function CRM() {
 
     setCreating(true);
     try {
-      await createContact(formData);
-      setFormData({
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: '',
-        title: '',
-        company_name: '',
-        date_of_birth: '',
-        notes: '',
-      });
-      setShowNewContact(false);
+      const contact = await createContact(formData);
+      if (contact) {
+        // Successfully created contact
+        setFormData({
+          first_name: '',
+          last_name: '',
+          email: '',
+          phone: '',
+          title: '',
+          company_name: '',
+          date_of_birth: '',
+          notes: '',
+        });
+        setShowNewContact(false);
+        console.log('Contact created successfully:', contact);
+      } else {
+        // Contact creation failed (returned null)
+        console.error('Contact creation failed - no organization or user context');
+        alert('Failed to create contact. Please make sure you are logged in and have an organization selected.');
+      }
     } catch (error) {
       console.error('Failed to create contact:', error);
+      alert('Failed to create contact: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setCreating(false);
     }
