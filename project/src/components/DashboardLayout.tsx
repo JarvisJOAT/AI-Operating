@@ -26,7 +26,7 @@ const navigation = [
   { name: 'Projects', href: '/projects', icon: FolderKanban },
   { name: 'CRM', href: '/crm', icon: Users },
   { name: 'Marketing & Social', href: '/marketing-social', icon: Mail },
-  { name: 'AI Agents', href: '/agents', icon: Bot },
+  { name: 'AI Agents & Coding', href: '/agents', icon: Bot },
   { name: 'MCP Servers', href: '/mcp', icon: Server },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Settings', href: '/settings', icon: Settings },
