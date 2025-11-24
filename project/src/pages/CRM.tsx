@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useContacts } from '../hooks/useContacts';
+import { useCompanies } from '../hooks/useCompanies';
 import { Users, Plus, Search, Mail, Phone, Building2, X, Loader2, Filter, Edit2, Calendar, MessageCircle, Clock, Send, Inbox } from 'lucide-react';
 
 export default function CRM() {
   const { contacts, loading, createContact, updateContact } = useContacts();
-  const [activeTab, setActiveTab] = useState<'contacts' | 'messages'>('contacts');
+  const { companies, loading: companiesLoading, createCompany } = useCompanies();
+  const [activeTab, setActiveTab] = useState<'contacts' | 'messages' | 'companies'>('contacts');
   const [showNewContact, setShowNewContact] = useState(false);
+  const [showNewCompany, setShowNewCompany] = useState(false);
   const [editingContact, setEditingContact] = useState<any>(null);
   const [showEditContact, setShowEditContact] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,6 +24,14 @@ export default function CRM() {
     company_name: '',
     date_of_birth: '',
     notes: '',
+  });
+  const [companyFormData, setCompanyFormData] = useState({
+    name: '',
+    domain: '',
+    industry: '',
+    website: '',
+    phone: '',
+    description: '',
   });
   const [editFormData, setEditFormData] = useState({
     first_name: '',
@@ -105,6 +116,29 @@ export default function CRM() {
     }
   };
 
+  const handleCreateCompany = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!companyFormData.name.trim()) return;
+
+    setCreating(true);
+    try {
+      await createCompany(companyFormData);
+      setCompanyFormData({
+        name: '',
+        domain: '',
+        industry: '',
+        website: '',
+        phone: '',
+        description: '',
+      });
+      setShowNewCompany(false);
+    } catch (error) {
+      console.error('Failed to create company:', error);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const handleUpdateContact = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingContact || !editFormData.first_name.trim()) return;
@@ -167,11 +201,11 @@ export default function CRM() {
           <h1 className="text-3xl font-bold text-gray-900">CRM</h1>
         </div>
         <button
-          onClick={() => setShowNewContact(true)}
+          onClick={() => activeTab === 'companies' ? setShowNewCompany(true) : setShowNewContact(true)}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
         >
           <Plus className="w-5 h-5" />
-          New Contact
+          {activeTab === 'companies' ? 'New Company' : 'New Contact'}
         </button>
       </div>
 
@@ -181,22 +215,30 @@ export default function CRM() {
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab('contacts')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'contacts'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'contacts'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               <Users className="w-4 h-4 inline mr-2" />
               Contacts
             </button>
             <button
+              onClick={() => setActiveTab('companies')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'companies'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+            >
+              <Building2 className="w-4 h-4 inline mr-2" />
+              Companies
+            </button>
+            <button
               onClick={() => setActiveTab('messages')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'messages'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'messages'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               <MessageCircle className="w-4 h-4 inline mr-2" />
               Unified Messages
@@ -414,6 +456,77 @@ export default function CRM() {
         </div>
       )}
 
+
+
+      {activeTab === 'companies' && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+          {companies.length === 0 ? (
+            <div className="p-12 text-center">
+              <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No companies yet</h3>
+              <p className="text-gray-600 mb-4">Add your first company to get started</p>
+              <button
+                onClick={() => setShowNewCompany(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition"
+              >
+                Add Your First Company
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Website</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Added</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {companies.map((company) => (
+                    <tr key={company.id} className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-semibold text-sm mr-3">
+                            {company.name.charAt(0)}
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{company.name}</div>
+                            {company.description && (
+                              <div className="text-sm text-gray-500 truncate max-w-xs">{company.description}</div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                          {company.industry || 'Unspecified'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {company.website ? (
+                          <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                            {company.website.replace(/^https?:\/\//, '')}
+                          </a>
+                        ) : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {company.phone || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(company.created_at).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
       {activeTab === 'messages' && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
           <div className="p-6">
@@ -486,18 +599,17 @@ export default function CRM() {
                                 <span className="font-medium text-gray-900">
                                   {contact.first_name} {contact.last_name}
                                 </span>
-                                <span className={`text-xs px-2 py-0.5 rounded ${
-                                  index % 3 === 0 ? 'bg-blue-100 text-blue-700' :
+                                <span className={`text-xs px-2 py-0.5 rounded ${index % 3 === 0 ? 'bg-blue-100 text-blue-700' :
                                   index % 3 === 1 ? 'bg-green-100 text-green-700' :
-                                  'bg-orange-100 text-orange-700'
-                                }`}>
+                                    'bg-orange-100 text-orange-700'
+                                  }`}>
                                   {index % 3 === 0 ? 'Email' : index % 3 === 1 ? 'SMS' : 'Social'}
                                 </span>
                               </div>
                               <p className="text-sm text-gray-600 line-clamp-2">
                                 {index % 3 === 0 ? 'Following up on our conversation about AI solutions...' :
-                                 index % 3 === 1 ? 'Thanks for your interest! Here are more details...' :
-                                 'Check out our latest campaign on LinkedIn!'}
+                                  index % 3 === 1 ? 'Thanks for your interest! Here are more details...' :
+                                    'Check out our latest campaign on LinkedIn!'}
                               </p>
                               <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
                                 <Clock className="w-3 h-3" />
@@ -777,6 +889,358 @@ export default function CRM() {
                   className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {updating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Update Contact'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {showNewCompany && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Create New Company</h2>
+              <button
+                onClick={() => setShowNewCompany(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateCompany} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Company Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={companyFormData.name}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  placeholder="Acme Corporation"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                  <input
+                    type="text"
+                    value={companyFormData.industry}
+                    onChange={(e) => setCompanyFormData({ ...companyFormData, industry: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                    placeholder="Technology"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                  <input
+                    type="tel"
+                    value={companyFormData.phone}
+                    onChange={(e) => setCompanyFormData({ ...companyFormData, phone: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                <input
+                  type="url"
+                  value={companyFormData.website}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, website: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  placeholder="https://example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea
+                  value={companyFormData.description}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none resize-none"
+                  placeholder="Brief description of the company..."
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowNewCompany(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating || !companyFormData.name.trim()}
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Company'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {showNewCompany && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Create New Company</h2>
+              <button
+                onClick={() => setShowNewCompany(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateCompany} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Company Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={companyFormData.name}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  placeholder="Acme Corporation"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                  <input
+                    type="text"
+                    value={companyFormData.industry}
+                    onChange={(e) => setCompanyFormData({ ...companyFormData, industry: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                    placeholder="Technology"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                  <input
+                    type="tel"
+                    value={companyFormData.phone}
+                    onChange={(e) => setCompanyFormData({ ...companyFormData, phone: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                <input
+                  type="url"
+                  value={companyFormData.website}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, website: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  placeholder="https://example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea
+                  value={companyFormData.description}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none resize-none"
+                  placeholder="Brief description of the company..."
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowNewCompany(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating || !companyFormData.name.trim()}
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Company'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {showNewCompany && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Create New Company</h2>
+              <button
+                onClick={() => setShowNewCompany(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateCompany} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Company Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={companyFormData.name}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  placeholder="Acme Corporation"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                  <input
+                    type="text"
+                    value={companyFormData.industry}
+                    onChange={(e) => setCompanyFormData({ ...companyFormData, industry: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                    placeholder="Technology"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                  <input
+                    type="tel"
+                    value={companyFormData.phone}
+                    onChange={(e) => setCompanyFormData({ ...companyFormData, phone: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                <input
+                  type="url"
+                  value={companyFormData.website}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, website: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  placeholder="https://example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea
+                  value={companyFormData.description}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none resize-none"
+                  placeholder="Brief description of the company..."
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowNewCompany(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating || !companyFormData.name.trim()}
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Company'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {showNewCompany && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Create New Company</h2>
+              <button
+                onClick={() => setShowNewCompany(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateCompany} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Company Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={companyFormData.name}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  placeholder="Acme Corporation"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                  <input
+                    type="text"
+                    value={companyFormData.industry}
+                    onChange={(e) => setCompanyFormData({ ...companyFormData, industry: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                    placeholder="Technology"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                  <input
+                    type="tel"
+                    value={companyFormData.phone}
+                    onChange={(e) => setCompanyFormData({ ...companyFormData, phone: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                <input
+                  type="url"
+                  value={companyFormData.website}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, website: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  placeholder="https://example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea
+                  value={companyFormData.description}
+                  onChange={(e) => setCompanyFormData({ ...companyFormData, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none resize-none"
+                  placeholder="Brief description of the company..."
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowNewCompany(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating || !companyFormData.name.trim()}
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Company'}
                 </button>
               </div>
             </form>

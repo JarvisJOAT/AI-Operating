@@ -35,41 +35,16 @@ export default function OrganizationSetup() {
 
     setLoading(true);
     try {
-      const { data: org, error: orgError } = await supabase
-        .from('organizations')
-        .insert({
-          name: formData.name,
-          slug: formData.slug,
-          subscription_tier: 'free',
-          subscription_status: 'trial',
-        })
-        .select()
-        .single();
+      // @ts-ignore - RPC function created manually in SQL
+      const { data: orgId, error: rpcError } = await supabase.rpc('create_new_organization', {
+        org_name: formData.name,
+        org_slug: formData.slug,
+      });
 
-      if (orgError) throw orgError;
+      if (rpcError) throw rpcError;
 
-      const { error: memberError } = await supabase
-        .from('organization_members')
-        .insert({
-          organization_id: org.id,
-          user_id: user.id,
-          role: 'owner',
-          joined_at: new Date().toISOString(),
-        });
-
-      if (memberError) throw memberError;
-
-      const { error: workspaceError } = await supabase
-        .from('workspaces')
-        .insert({
-          organization_id: org.id,
-          name: 'General',
-          description: 'Default workspace',
-          is_default: true,
-          created_by: user.id,
-        });
-
-      if (workspaceError) throw workspaceError;
+      // Wait a moment for the trigger to propagate
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       await refetchOrganizations();
       navigate('/dashboard');

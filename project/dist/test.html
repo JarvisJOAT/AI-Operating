@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Supabase Connection Test</title>
+</head>
+<body>
+    <h1>Testing Supabase Connection</h1>
+    <div id="output"></div>
+    <script type="module">
+        const url = 'https://wjkxlpwvzdfzsgqhhfsq.supabase.co';
+        const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indqa3hscHd2emRmenNncWhoZnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNTM2MDIsImV4cCI6MjA3ODcyOTYwMn0.O1pFnmoWxKWE1Bj3QaZJxEv9ZdWyYji0QgWafATY3l8';
+
+        const output = document.getElementById('output');
+        output.innerHTML = '<p>URL: ' + url + '</p><p>Testing connection...</p>';
+
+        fetch(url + '/rest/v1/', {
+            headers: {
+                'apikey': key,
+                'Authorization': 'Bearer ' + key
+            }
+        }).then(r => {
+            output.innerHTML += '<p style="color: green;">Connection successful! Status: ' + r.status + '</p>';
+        }).catch(e => {
+            output.innerHTML += '<p style="color: red;">Connection failed: ' + e.message + '</p>';
+        });
+    </script>
+</body>
+</html>

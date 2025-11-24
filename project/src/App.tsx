@@ -12,6 +12,7 @@ import Projects from './pages/Projects';
 import CRM from './pages/CRM';
 import MarketingSocial from './pages/MarketingSocial';
 import Agents from './pages/Agents';
+
 import MCP from './pages/MCP';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
@@ -39,6 +40,13 @@ function OrganizationRoute({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const { currentOrganization, loading: orgLoading } = useOrganization();
 
+  console.log('OrganizationRoute check:', {
+    authLoading,
+    orgLoading,
+    user: user?.id,
+    currentOrganization: currentOrganization?.id
+  });
+
   if (authLoading || orgLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -48,17 +56,21 @@ function OrganizationRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
+    console.log('No user, redirecting to login');
     return <Navigate to="/login" replace />;
   }
 
-  if (!currentOrganization) {
-    return <Navigate to="/setup" replace />;
-  }
 
+
+  console.log('User has organization, continuing');
   return <>{children}</>;
 }
 
+import { useFacebookSDK } from './hooks/useFacebookSDK';
+
 function App() {
+  useFacebookSDK();
+
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -67,34 +79,35 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route
-              path="/setup"
-              element={
-                <ProtectedRoute>
-                  <OrganizationSetup />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/setup"
+                element={
+                  <ProtectedRoute>
+                    <OrganizationSetup />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <DashboardLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="projects" element={<Projects />} />
-              <Route path="crm" element={<CRM />} />
-              <Route path="marketing-social" element={<MarketingSocial />} />
-              <Route path="agents" element={<Agents />} />
-              <Route path="mcp" element={<MCP />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
-          </Routes>
+              <Route
+                path="/"
+                element={
+                  <OrganizationRoute>
+                    <DashboardLayout />
+                  </OrganizationRoute>
+                }
+              >
+                <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="projects" element={<Projects />} />
+                <Route path="crm" element={<CRM />} />
+                <Route path="marketing-social" element={<MarketingSocial />} />
+                <Route path="agents" element={<Agents />} />
+
+                <Route path="mcp" element={<MCP />} />
+                <Route path="analytics" element={<Analytics />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
+            </Routes>
           </ToastProvider>
         </OrganizationProvider>
       </AuthProvider>

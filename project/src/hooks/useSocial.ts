@@ -6,31 +6,47 @@ import { useAuth } from '../contexts/AuthContext';
 export interface SocialPost {
   id: string;
   organization_id: string;
-  account_ids: string[];
+  account_ids: string[] | null;
   content: string;
   media_urls: string[] | null;
-  status: 'draft' | 'scheduled' | 'published' | 'failed';
+  status: string | null;
   scheduled_at: string | null;
   published_at: string | null;
   metrics: any;
-  created_at: string;
-  updated_at: string;
+  created_by: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface SocialMediaAccount {
+  id: string;
+  organization_id: string;
+  platform: string | null;
+  account_name: string;
+  account_id: string | null;
+  access_token: string | null;
+  refresh_token: string | null;
+  token_expires_at: string | null;
+  is_active: boolean | null;
+  metadata: any;
+  connected_by: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export function useSocial() {
   const { currentOrganization } = useOrganization();
   const { user } = useAuth();
   const [posts, setPosts] = useState<SocialPost[]>([]);
+  const [accounts, setAccounts] = useState<SocialMediaAccount[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchPosts = useCallback(async () => {
     if (!currentOrganization) {
       setPosts([]);
-      setLoading(false);
       return;
     }
 
-    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('social_media_posts')
@@ -42,14 +58,49 @@ export function useSocial() {
       setPosts(data || []);
     } catch (error) {
       console.error('Error fetching social posts:', error);
-    } finally {
-      setLoading(false);
     }
   }, [currentOrganization]);
 
+  const fetchAccounts = useCallback(async () => {
+    if (!currentOrganization) {
+      setAccounts([]);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('social_media_accounts')
+        .select('*')
+        .eq('organization_id', currentOrganization.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setAccounts(data || []);
+    } catch (error) {
+      console.error('Error fetching social accounts:', error);
+    }
+  }, [currentOrganization]);
+
+  const refreshAccounts = useCallback(async () => {
+    await fetchAccounts();
+  }, [fetchAccounts]);
+
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    const loadData = async () => {
+      if (!currentOrganization) {
+        setPosts([]);
+        setAccounts([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      await Promise.all([fetchPosts(), fetchAccounts()]);
+      setLoading(false);
+    };
+
+    loadData();
+  }, [currentOrganization, fetchPosts, fetchAccounts]);
 
   const createPost = async (postData: {
     content: string;
@@ -84,5 +135,74 @@ export function useSocial() {
     }
   };
 
-  return { posts, loading, createPost, refetch: fetchPosts };
+  const connectAccount = async (accountData: {
+    platform: string;
+    account_name: string;
+    account_id: string;
+    access_token?: string;
+    refresh_token?: string;
+    token_expires_at?: string;
+    metadata?: any;
+  }) => {
+    if (!currentOrganization || !user) {
+      throw new Error('No organization or user selected');
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('social_media_accounts')
+        .upsert({
+          organization_id: currentOrganization.id,
+          platform: accountData.platform,
+          account_name: accountData.account_name,
+          account_id: accountData.account_id,
+          access_token: accountData.access_token || null,
+          refresh_token: accountData.refresh_token || null,
+          token_expires_at: accountData.token_expires_at || null,
+          metadata: accountData.metadata || {},
+          connected_by: user.id,
+          is_active: true
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      await fetchAccounts();
+      return data;
+    } catch (error) {
+      console.error('Error connecting social account:', error);
+      throw error;
+    }
+  };
+
+  const disconnectAccount = async (accountId: string) => {
+    if (!currentOrganization) {
+      throw new Error('No organization selected');
+    }
+
+    try {
+      const { error } = await supabase
+        .from('social_media_accounts')
+        .delete()
+        .eq('id', accountId)
+        .eq('organization_id', currentOrganization.id);
+
+      if (error) throw error;
+      await fetchAccounts();
+    } catch (error) {
+      console.error('Error disconnecting social account:', error);
+      throw error;
+    }
+  };
+
+  return {
+    posts,
+    accounts,
+    loading,
+    createPost,
+    connectAccount,
+    disconnectAccount,
+    refetchPosts: fetchPosts,
+    refetchAccounts: refreshAccounts
+  };
 }

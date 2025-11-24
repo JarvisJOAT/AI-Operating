@@ -7,6 +7,16 @@ import {
   LogOut,
   Building2,
   Sparkles,
+  Home,
+  FolderKanban,
+  Users,
+  Mail,
+  Bot,
+  Server,
+  BarChart3,
+  Settings,
+  Menu,
+  X,
 } from 'lucide-react';
 import ChatBot from './ChatBot';
 import CommandPalette from './CommandPalette';
@@ -49,9 +59,8 @@ export default function DashboardLayout() {
       </div>
 
       <div
-        className={`fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 z-40 transform transition-transform duration-200 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
+        className={`fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 z-40 transform transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0`}
       >
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-gray-200">
@@ -83,9 +92,8 @@ export default function DashboardLayout() {
                         switchOrganization(org.id);
                         setOrgMenuOpen(false);
                       }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition ${
-                        currentOrganization?.id === org.id ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                      }`}
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition ${currentOrganization?.id === org.id ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                        }`}
                     >
                       {org.name}
                     </button>
@@ -104,11 +112,10 @@ export default function DashboardLayout() {
                   key={item.name}
                   to={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${isActive
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'text-gray-700 hover:bg-gray-50'
+                    }`}
                 >
                   <Icon className="w-5 h-5" />
                   {item.name}
@@ -155,7 +162,7 @@ export default function DashboardLayout() {
 
       {/* ChatBot - Available on all pages */}
       <ChatBot />
-      
+
       {/* Command Palette - Global shortcut Cmd+K */}
       <CommandPalette />
     </div>
