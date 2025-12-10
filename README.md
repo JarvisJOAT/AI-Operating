@@ -1,372 +1,394 @@
-# 🤖 AI-Operating - Complete Business Operations Platform
+# 🚀 AI-Operating Platform
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![React](https://img.shields.io/badge/React-18.2.0-61DAFB)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0.0-3178C6)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-5.4.8-646CFF)](https://vitejs.dev/)
-[![Supabase](https://img.shields.io/badge/Supabase-2.39.0-3ECF8E)](https://supabase.com/)
+> **Comprehensive AI-powered business automation platform** for managing multiple business applications, AI agents, CRM, projects, and unified messaging.
 
-**AI-Operating is a comprehensive SaaS platform that integrates AI-powered agents with complete business operations management, including CRM, project management, and multi-channel communication hubs.**
-
----
-
-## 🎯 **Platform Overview**
-
-AI-Operating provides businesses with an integrated ecosystem where AI agents handle complex tasks while human operators manage relationships, projects, and communications through intuitive interfaces. The platform follows a "human-AI collaboration" model where AI handles the heavy lifting and humans provide strategic direction.
-
-### **🏗️ Architecture Highlights**
-- **Frontend:** React + TypeScript + Vite + Tailwind CSS
-- **Backend:** Supabase (PostgreSQL + Auth + Real-time subscriptions)
-- **AI Integration:** Custom MCP (Model Context Protocol) server integration
-- **Security:** Enterprise-grade multi-tenant data isolation
-- **State Management:** React hooks + context providers
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.x-61DAFB)](https://reactjs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-38B2AC)](https://tailwindcss.com/)
 
 ---
 
-## 💼 **Core Business Modules**
+## 📋 Table of Contents
 
-### **1. 🤖 AI Agent Management System**
-- **Advanced Agent Creation:** Wizard-based, JSON import, n8n workflow integration
-- **Knowledge Base:** File uploads, web reference links, persistent memory
-- **Configuration Options:** Model selection, temperature, custom prompts, API keys
-- **Real-time Monitoring:** Agent execution logs, cost tracking, performance metrics
-- **Multi-Agent Orchestration:** Agent-to-agent communication and workflow chaining
-
-### **2. 📊 CRM & Customer Management**
-- **Professional Contact Table:** 8-column data grid with sorting/filtering
-- **Unified Communications:** Single hub for email, SMS, social media DMs, forms
-- **Contact Scoring & Status:** Lead qualification workflow with automated scoring
-- **Organization Isolation:** Zero cross-tenant data access with enterprise security
-- **Phone Standardization:** Consistent XXX-XXX-XXXX formatting across all contacts
-
-### **3. 🎯 Project & Task Management**
-- **Kanban Board:** Visual task management with 4 status columns (To Do, In Progress, Review, Done)
-- **Project Details:** Comprehensive project information panels with cost tracking
-- **Team Collaboration:** Project-based task assignment and progress tracking
-- **Priority Management:** High/medium/low task prioritization
-- **Time Tracking:** Task-based time entry with duration logging
-
-### **4. 💬 Unified Messaging Hub**
-- **Multi-Channel Integration:** Email, SMS, social media, form submissions
-- **Unified Inbox:** Single interface for all customer communications
-- **Message Threading:** Context-aware conversation management
-- **AI Agent Integration:** Automatic responses and intelligent routing
-- **Communication Analytics:** Message volume, response times, engagement metrics
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Business Applications](#business-applications)
+- [Core Features](#core-features)
+- [Database Schema](#database-schema)
+- [API Documentation](#api-documentation)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
-## 🔒 **Security & Compliance**
+## 🎯 Overview
 
-### **Enterprise-Grade Multi-Tenant Security**
-- **Complete Data Isolation:** Each organization sees ONLY their own data
-- **Organization-Scoped Access:** Projects, contacts, agents, and messages are isolated
-- **Enterprise Authentication:** Supabase Auth-based user management
-- **API Security:** Row-level security policies and access token management
+AI-Operating is an enterprise-grade platform designed to:
 
-### **Data Architecture**
+- **Manage AI Agents**: Voice agents, chat agents, and task automation
+- **Integrate Business Apps**: Unified dashboard for multiple business applications
+- **CRM & Project Management**: Full-featured customer and project tracking
+- **Multi-tenant Architecture**: Secure data isolation between organizations
+- **Real-time Sync**: Periodic synchronization between apps and central dashboard
+
+### Business Applications
+
+| App | Description | Key Features |
+|-----|-------------|--------------|
+| **Keys Open Doors** | Real estate deal automation | InvestorLift scraping, AI captions, Instagram auto-posting |
+| **Food Truck** | Mobile ordering system | AI voice agent, order management, SMS notifications |
+| **Construction Manager** | Project management | OCR receipts, multilingual messaging, document versioning |
+
+---
+
+## 🏗️ Architecture
+
 ```
-Organization A:
-├── Projects → Only A
-├── Contacts → Only A
-├── AI Agents → Only A
-└── Messages → Only A
-
-Organization B:
-├── Projects → Only B
-├── Contacts → Only B
-├── AI Agents → Only B
-└── Messages → Only B
+┌─────────────────────────────────────────────────────────────────┐
+│                    AI-Operating Platform                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
+│  │   gasweb-site   │  │  AI-Operating   │  │  Admin Panel    │ │
+│  │   (Marketing)   │  │   Dashboard     │  │   (Internal)    │ │
+│  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘ │
+│           │                    │                    │          │
+│           └──────────────────────────────────────────┘          │
+│                              │                                  │
+│                    ┌─────────▼─────────┐                       │
+│                    │   Supabase        │                       │
+│                    │ (PostgreSQL + RLS)│                       │
+│                    └─────────┬─────────┘                       │
+│                              │                                  │
+│  ┌───────────────────────────┼───────────────────────────┐     │
+│  │                    Business Apps                       │     │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │     │
+│  │  │ Keys Open    │  │  Food Truck  │  │ Construction │ │     │
+│  │  │    Doors     │  │   Ordering   │  │   Manager    │ │     │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘ │     │
+│  └───────────────────────────────────────────────────────┘     │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
+### Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS |
+| **Backend** | Supabase (PostgreSQL), Edge Functions |
+| **Auth** | Supabase Auth (OAuth, Magic Link) |
+| **Real-time** | Supabase Realtime |
+| **APIs** | OpenAI GPT-4o, Twilio, Google Cloud Vision/Translate |
+| **Payments** | Stripe, PayPal, Crypto |
+
 ---
 
-## 🚀 **Getting Started**
+## 📁 Project Structure
 
-### **Prerequisites**
-- Node.js 18+ and npm
-- Supabase account (for full database features)
+```
+AI-Operating/
+├── project/                    # Main AI-Operating Dashboard
+│   ├── src/
+│   │   ├── components/         # Reusable UI components
+│   │   ├── contexts/           # React context providers
+│   │   ├── hooks/              # Custom React hooks
+│   │   ├── pages/              # Page components
+│   │   ├── services/           # Business logic services
+│   │   └── lib/                # Utilities and Supabase client
+│   └── package.json
+│
+├── gasweb-site/                # Marketing website (gasweb.info)
+│   ├── src/
+│   │   ├── pages/              # Home, Services, Education, etc.
+│   │   └── components/         # Layout, Navigation
+│   └── package.json
+│
+├── business-apps/              # Individual business applications
+│   ├── keys-open-doors/        # Real estate automation
+│   │   ├── src/
+│   │   │   ├── routes/         # API endpoints
+│   │   │   ├── services/       # Scraper, Poster, Caption Gen
+│   │   │   └── config/         # App configuration
+│   │   └── package.json
+│   │
+│   ├── food-truck/             # Food ordering system
+│   │   ├── src/
+│   │   │   ├── routes/         # Orders, Menu, Voice
+│   │   │   ├── services/       # Voice Agent, Payments
+│   │   │   └── config/
+│   │   └── package.json
+│   │
+│   └── construction-mgmt/      # Construction management
+│       ├── src/
+│       │   ├── routes/         # Projects, Tasks, Expenses
+│       │   ├── services/       # OCR, Translation
+│       │   └── config/
+│       └── package.json
+│
+├── supabase/
+│   ├── config.toml             # Supabase configuration
+│   └── migrations/             # Database schema migrations
+│
+├── docs/                       # Documentation
+│   ├── integration/
+│   └── admin-training/
+│
+└── README.md                   # This file
+```
 
-### **Installation**
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Supabase account
+- API keys: OpenAI, Twilio, Google Cloud
+
+### Quick Start
+
 ```bash
 # Clone the repository
-git clone https://github.com/JarvisJOAT/AI-Operating.git
-cd AI-Operating
+git clone https://github.com/your-org/ai-operating.git
+cd ai-operating
 
-# Install dependencies
+# Install dependencies for main dashboard
 cd project
 npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your API keys
 
 # Start development server
 npm run dev
 ```
 
-### **Environment Setup**
-Create `.env.local` in the project root:
+### Environment Variables
+
 ```env
+# Supabase
 VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_anon_key
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# OpenAI
+OPENAI_API_KEY=your_openai_key
+
+# Twilio (for Food Truck Voice Agent)
+TWILIO_ACCOUNT_SID=your_twilio_sid
+TWILIO_AUTH_TOKEN=your_twilio_token
+
+# Google Cloud (for OCR & Translation)
+GOOGLE_CLOUD_KEY_FILE=path_to_key.json
+GOOGLE_TRANSLATE_API_KEY=your_translate_key
+
+# Stripe (for Payments)
+STRIPE_SECRET_KEY=your_stripe_key
+STRIPE_WEBHOOK_SECRET=your_webhook_secret
 ```
 
 ---
 
-## 🎨 **User Interface Features**
+## 📱 Business Applications
 
-### **Dashboard**
-- **Overview Analytics:** Key metrics and KPIs
-- **Recent Activity:** Timeline of recent actions
-- **Quick Actions:** One-click access to common tasks
-- **AI Agent Status:** Real-time agent monitoring
+### Keys Open Doors
 
-### **CRM Management**
-- **Contact Table:** Professional 8-column data presentation
-- **Lead Scoring:** Automated and manual lead qualification
-- **Communication Tracking:** Last correspondence dates (clickable navigation)
-- **Contact Segmentation:** Status and priority-based filtering
+**Real estate wholesale deal automation**
 
-### **AI Agent Management**
-- **Agent Gallery:** Visual cards showing agent capabilities
-- **Configuration Panel:** Advanced setup options
-- **Performance Metrics:** Usage statistics and success rates
-- **Integration Testing:** Real-time agent testing interface
-
-### **Project Management**
-- **Visual Kanban:** Drag-and-drop task management
-- **Project Details:** Cost, budget, deadline tracking
-- **Team Assignments:** Multi-member project management
-- **Progress Reporting:** Automatic milestone tracking
-
----
-
-## 🛠️ **Current Development State**
-
-### **✅ Completed Features**
-
-#### **Core Platform Architecture**
-- [x] **Authentication System:** Supabase-based user management
-- [x] **Organization Multi-tenancy:** Complete data isolation
-- [x] **Database Schema:** Comprehensive PostgreSQL tables
-- [x] **Frontend Framework:** React/TypeScript/Vite setup
-
-#### **AI Agent System**
-- [x] **Agent Creation Wizard:** Step-by-step AI agent setup
-- [x] **Configuration Management:** Advanced agent settings
-- [x] **Knowledge Base:** File and reference management
-- [x] **Execution Tracking:** Performance monitoring
-- [x] **MCP Server Integration:** External tool connectivity
-
-#### **CRM Implementation**
-- [x] **Contact Management:** Professional table interface
-- [x] **Data Standardization:** Consistent phone number formatting
-- [x] **Organization Isolation:** Critical security implementation
-- [x] **Contact Scoring:** Lead qualification system
-
-#### **Project Management**
-- [x] **Kanban Implementation:** Visual task management
-- [x] **Project CRUD:** Create, read, update, delete functionality
-- [x] **Cost Tracking:** Budget and expense management
-- [x] **Task Assignment:** Team collaboration features
-
-#### **Unified Communications**
-- [x] **Tab Navigation:** Contacts ↔ Messages interface
-- [x] **Message Hub Design:** Multi-channel communication
-- [x] **Date Navigation:** Clickable last correspondence dates
-- [x] **Communication Dashboard:** Overview and filtering
-
-#### **Security & Compliance**
-- [x] **Data Isolation:** ZERO cross-organization data leaks
-- [x] **RLS Implementation:** Database-level security policies
-- [x] **Organization Scoping:** All data properly isolated
-- [x] **Enterprise-Ready:** HIPAA/GDPR-compliant architecture
-
-### **🚧 Next Development Priorities**
-
-#### **Immediate Tasks**
-- **AI Agent Marketplace:** Browse and deploy pre-built agents
-- **Advanced Analytics:** Detailed reporting and insights dashboard
-- **Email Integration:** Native email sending/receiving
-- **Social Media API:** Direct platform integrations
-
-#### **Medium Term Goals**
-- **API Webhooks:** External service integrations
-- **Advanced Workflows:** Conditional logic and automation
-- **Mobile Application:** iOS/Android native apps
-- **Team Collaboration:** Advanced permission system
-
-#### **Long Term Vision**
-- **AI Strategy Advisor:** Automated business consulting
-- **Predictive Analytics:** ML-based insights
-- **Internet of Things:** Smart device integration
-- **Marketplace Economy:** Third-party agent ecosystem
-
----
-
-## 🤖 **AI Agent Capabilities**
-
-### **Supported Agent Types**
-- **Sales Assistants:** Lead qualification and follow-up
-- **Customer Service:** Automated support and routing
-- **Data Analysis:** Business intelligence and reporting
-- **Content Creation:** Marketing copy and documentation
-- **Project Management:** Task automation and scheduling
-
-### **Integration Points**
-- **MCP Servers:** External tool and API connectivity
-- **Email Systems:** Automated communication flows
-- **CRM Systems:** Intelligent lead scoring
-- **Social Media:** Content and engagement automation
-- **E-commerce:** Order processing and customer service
-
----
-
-## 📁 **Project Structure**
-
-```
-AI-Operating/
-├── project/
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── contexts/       # React context providers
-│   │   ├── hooks/          # Custom React hooks
-│   │   ├── pages/          # Page components
-│   │   ├── lib/            # Utilities and services
-│   │   └── types/          # TypeScript definitions
-│   ├── public/             # Static assets
-│   └── package.json
-├── supabase/
-│   ├── config.toml         # Supabase configuration
-│   └── migrations/         # Database schema migrations
-└── README.md               # This documentation
-```
-
----
-
-## 🔑 **Key Technical Decisions**
-
-### **Frontend Architecture**
-- **React 18** with hooks for modern component management
-- **TypeScript** for type safety and developer experience
-- **Vite** for fast development builds and HMR
-- **Tailwind CSS** for rapid UI development
-
-### **Database Design**
-- **Supabase** for scalable Postgres with built-in auth
-- **Row Level Security** for multi-tenant data isolation
-- **Real-time subscriptions** for live updates
-- **JSON fields** for flexible metadata storage
-
-### **Security Model**
-- **Organization-scoped data access** prevents data leakage
-- **API-based interactions** ensure proper access control
-- **Token-based authentication** with refresh cycles
-- **Audit logging** for compliance and debugging
-
----
-
-## 🚀 **Development Roadmap**
-
-### **Phase 1: Core Platform ✅ COMPLETED**
-- Authentication and user management
-- Basic AI agent creation and management
-- CRM with contact management
-- Project/task management
-- Unified communications hub
-
-### **Phase 2: Advanced Features 🔄 IN PROGRESS**
-- AI agent marketplace
-- Advanced analytics and reporting
-- Email and social media integrations
-- Workflow automation
-
-### **Phase 3: Ecosystem Expansion 🔮 PLANNED**
-- Mobile applications
-- Third-party integrations
-- Advanced AI capabilities
-- Global scaling infrastructure
-
----
-
-## 🤝 **Contributing**
-
-### **Development Setup**
-1. Fork and clone the repository
-2. Install dependencies: `cd project && npm install`
-3. Create feature branch: `git checkout -b feature/your-feature`
-4. Start development: `npm run dev`
-5. Follow existing code patterns and security practices
-
-### **Code Quality Standards**
-- TypeScript strict mode enforcement
-- ESLint configuration for consistency
-- Prettier for automatic formatting
-- Comprehensive unit and integration testing
-
-### **Security Guidelines**
-- Never commit sensitive data or API keys
-- Follow principle of least privilege
-- Implement proper data validation
-- Regular security audits and dependency updates
-
----
-
-## 📈 **Performance & Scalability**
-
-### **Current Architecture**
-- **Micro-frontend design** for modular scalability
-- **Component lazy loading** for faster initial load
-- **Optimized database queries** with proper indexing
-- **CDN-ready assets** for global distribution
-
-### **Infrastructure Considerations**
-- **Auto-scaling containers** for variable load
-- **Multi-region deployment** for global availability
-- **Database sharding** for massive data volumes
-- **Caching layers** for performance optimization
-
----
-
-## 🏆 **Achievements & Impact**
-
-### **Technical Accomplishments**
-- **Zero Data Security Breaches:** Perfect multi-tenant isolation
-- **Modern Tech Stack:** Latest frameworks and best practices
-- **Scalable Architecture:** Enterprise-ready infrastructure
-- **Developer Experience:** Comprehensive tooling and documentation
-
-### **Business Value**
-- **Automated Workflow:** AI agents handle repetitive tasks
-- **Unified Platform:** Single interface for all business operations
-- **Security Confidence:** Enterprise-grade data protection
-- **Cost Efficiency:** Significant operational cost reduction
-
-### **Innovation Highlights**
-- **AI-Human Collaboration:** Perfect balance of automation and control
-- **Unified Communications:** Multi-platform message management
-- **Visual Management:** Kanban-style task and project oversight
-- **Intelligent CRM:** Automated lead scoring and management
-
----
-
-## 🎯 **Quick Start Commands**
+- **Scraping**: Automated InvestorLift marketplace scraping with Selenium
+- **AI Captions**: GPT-4o powered Instagram caption generation
+- **Auto-posting**: Instagram Graph API / instagrapi integration
+- **Analytics**: Deal performance tracking
 
 ```bash
-# Install and run
-cd AI-Operating/project
+cd business-apps/keys-open-doors
 npm install
-npm run dev
-
-# Build for production
-npm run build
-
-# Database management
-cd ..
-supabase start
-supabase db reset
+npm run dev  # Starts on port 3001
 ```
 
-**🌐 Website:** `http://localhost:5173/`
-**📧 Support:** Development questions welcome
-**🚀 Status:** Production-ready enterprise platform
+### Food Truck Ordering
+
+**AI-powered mobile ordering for food trucks**
+
+- **Voice Agent**: Twilio + OpenAI Whisper + GPT-4o
+- **Order Management**: Real-time order tracking
+- **Payments**: Cash, card, mobile, crypto
+- **Notifications**: SMS/Email order updates
+
+```bash
+cd business-apps/food-truck
+npm install
+npm run dev  # Starts on port 3002
+```
+
+### Construction Manager
+
+**Project management with multilingual support**
+
+- **Projects**: Full project lifecycle management
+- **Tasks**: Kanban board with assignments
+- **Receipts**: OCR processing with Google Vision
+- **Translation**: Real-time message translation
+- **Documents**: Version control system
+
+```bash
+cd business-apps/construction-mgmt
+npm install
+npm run dev  # Starts on port 3003
+```
 
 ---
 
-*AI-Operating: Where AI meets human intelligence in perfect business harmony.* 🤖❤️🚀
+## ⚡ Core Features
+
+### AI Agent Management
+- Voice agents for customer calls
+- Chat agents for support
+- Task automation agents
+
+### CRM System
+- Contact & company management
+- Deal pipeline tracking
+- Activity logging
+
+### Project Management
+- Multi-workspace support
+- Task boards (Kanban)
+- Time tracking
+
+### Unified Messaging
+- Cross-platform messaging
+- Real-time notifications
+- Message threading
+
+### Business Apps Hub
+- App instance management
+- Centralized configuration
+- Usage analytics
+
+### Admin Dashboard
+- Cross-organization view
+- System health monitoring
+- Event audit logs
+
+---
+
+## 🗃️ Database Schema
+
+Key tables (see `supabase/migrations/` for full schema):
+
+| Table | Purpose |
+|-------|---------|
+| `organizations` | Multi-tenant organization management |
+| `user_profiles` | User settings and preferences |
+| `business_apps` | App catalog |
+| `app_instances` | Per-org app deployments |
+| `app_configurations` | Instance-specific settings |
+| `app_sync_logs` | Data sync history |
+
+### Row Level Security (RLS)
+
+All tables implement RLS policies ensuring:
+- Users can only access their organization's data
+- Public read access where appropriate
+- Admin-only write access for sensitive operations
+
+---
+
+## 📖 API Documentation
+
+### Main Dashboard API
+
+Base URL: `https://api.ai-operating.com/v1`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/organizations` | GET | List user's organizations |
+| `/app-instances` | GET | Get app instances |
+| `/app-instances/:id/sync` | POST | Trigger sync |
+| `/agents` | GET/POST | Manage AI agents |
+
+### Business App APIs
+
+Each business app exposes its own API:
+
+- Keys Open Doors: `http://localhost:3001/api`
+- Food Truck: `http://localhost:3002/api`
+- Construction: `http://localhost:3003/api`
+
+See individual app documentation in `business-apps/*/docs/`.
+
+---
+
+## 🚢 Deployment
+
+### Vercel (Frontend)
+
+```bash
+# Deploy main dashboard
+cd project
+vercel deploy --prod
+
+# Deploy gasweb-site
+cd ../gasweb-site
+vercel deploy --prod
+```
+
+### Railway/Render (Business Apps)
+
+Each business app can be deployed as a separate service:
+
+```bash
+# Example: Deploy Keys Open Doors
+cd business-apps/keys-open-doors
+railway up  # or render deploy
+```
+
+### Database Migrations
+
+```bash
+# Run Supabase migrations
+npx supabase db push
+```
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Code Standards
+
+- TypeScript strict mode
+- ESLint + Prettier
+- Conventional commits
+- JSDoc comments for public APIs
+
+---
+
+## 📄 License
+
+This project is proprietary software. All rights reserved.
+
+---
+
+## 📞 Support
+
+- **Documentation**: `/docs`
+- **Email**: support@gasweb.info
+- **Issues**: GitHub Issues
+
+---
+
+Built with ❤️ by the GAS Team

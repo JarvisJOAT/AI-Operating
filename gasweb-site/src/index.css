@@ -1,0 +1,167 @@
+/**
+ * Global Styles for GasWeb.info
+ * 
+ * This file imports Tailwind CSS utilities and defines global styles.
+ * Custom CSS should be minimal - prefer Tailwind utilities.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Base Layer Customizations
+ * 
+ * Apply default styles to HTML elements.
+ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply font-sans antialiased text-slate-900 bg-white;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold tracking-tight;
+  }
+  
+  /* Custom scrollbar for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-100;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+  }
+}
+
+/**
+ * Component Layer
+ * 
+ * Reusable component styles using @apply directive.
+ */
+@layer components {
+  /* Primary button style */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 
+           bg-primary-600 text-white font-semibold rounded-xl
+           hover:bg-primary-700 focus:outline-none focus:ring-2 
+           focus:ring-primary-500 focus:ring-offset-2
+           transition-all duration-200 ease-in-out
+           shadow-soft hover:shadow-glow;
+  }
+  
+  /* Secondary button style */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3
+           bg-white text-primary-700 font-semibold rounded-xl
+           border-2 border-primary-200 hover:border-primary-400
+           hover:bg-primary-50 focus:outline-none focus:ring-2 
+           focus:ring-primary-500 focus:ring-offset-2
+           transition-all duration-200 ease-in-out;
+  }
+  
+  /* Accent button style for CTAs */
+  .btn-accent {
+    @apply inline-flex items-center justify-center px-6 py-3
+           bg-accent-500 text-white font-semibold rounded-xl
+           hover:bg-accent-600 focus:outline-none focus:ring-2 
+           focus:ring-accent-500 focus:ring-offset-2
+           transition-all duration-200 ease-in-out
+           shadow-soft hover:shadow-glow-accent;
+  }
+  
+  /* Card component */
+  .card {
+    @apply bg-white rounded-2xl shadow-soft 
+           border border-slate-100 overflow-hidden
+           transition-all duration-300 ease-in-out
+           hover:shadow-lg hover:border-slate-200;
+  }
+  
+  /* Section container */
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Section padding */
+  .section-padding {
+    @apply py-16 md:py-24;
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent 
+           bg-gradient-to-r from-primary-600 to-secondary-500;
+  }
+  
+  /* Input field */
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-slate-200
+           focus:outline-none focus:ring-2 focus:ring-primary-500 
+           focus:border-transparent transition-all duration-200
+           placeholder:text-slate-400;
+  }
+  
+  /* Link style */
+  .link {
+    @apply text-primary-600 hover:text-primary-700 
+           underline-offset-2 hover:underline
+           transition-colors duration-200;
+  }
+}
+
+/**
+ * Utility Layer
+ * 
+ * Custom utility classes.
+ */
+@layer utilities {
+  /* Text balance for better readability */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Animation delay utilities */
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+  
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+  
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+}
+

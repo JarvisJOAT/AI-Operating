@@ -7,6 +7,18 @@ import {
   LogOut,
   Building2,
   Sparkles,
+  Home,
+  FolderKanban,
+  Users,
+  Mail,
+  Bot,
+  Server,
+  BarChart3,
+  Settings,
+  Menu,
+  X,
+  Boxes,
+  Shield,
 } from 'lucide-react';
 import ChatBot from './ChatBot';
 import CommandPalette from './CommandPalette';
@@ -18,7 +30,9 @@ const navigation = [
   { name: 'Marketing & Social', href: '/marketing-social', icon: Mail },
   { name: 'AI Agents & Coding', href: '/agents', icon: Bot },
   { name: 'MCP Servers', href: '/mcp', icon: Server },
+  { name: 'Business Apps', href: '/business-apps', icon: Boxes },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Admin', href: '/admin', icon: Shield },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
